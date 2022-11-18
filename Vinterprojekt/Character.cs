@@ -1,7 +1,7 @@
 using Raylib_cs;
 
 class Character {
-  public List<Texture2D> outfits = new List<Texture2D>();
+  public List<Texture2D> outfits = new();
   public Character() //Döpt till samma som klassen, så koden körs varje gång en instans skapas
   {
     outfits.Add(Raylib.LoadTexture("a1.png"));
@@ -11,5 +11,21 @@ class Character {
     outfits.Add(Raylib.LoadTexture("a5.png"));
     outfits.Add(Raylib.LoadTexture("a6.png"));
   }
-  public Rectangle player = new Rectangle(0, 0, 66, 108);
+}
+
+class Background {
+  public List<Texture2D> backgrounds = new();
+  public Background() //Döpt till samma som klassen, så koden körs varje gång en instans skapas
+  {
+    backgrounds.Add(Raylib.LoadTexture("titlescreen.png"));
+    backgrounds.Add(Raylib.LoadTexture("charselectbg.png"));
+  }
+}
+
+class Door{
+  public List<Rectangle> doors = new();
+  // foreach (door d in doors)
+  // {
+    
+  // }
 }

@@ -1,20 +1,21 @@
 ﻿using Raylib_cs;
 using System.Numerics;
 
-
 const int screenwidth = 1024;
 const int screenheight = 768;
 Raylib.InitWindow(screenwidth, screenheight, "Mall Runner");
 Raylib.SetTargetFPS(60);
 
-Character c = new Character();
-Background b = new Background();
+Character c = new();
+Background b = new();
 
 string currentScene = "start";
 
 float speed = 4.5f;
 int avatarShown = 0;
 List<string> inventory = new();
+Rectangle player = new(0, 0, c.outfits[0].width, c.outfits[0].height);
+
 
 
 
@@ -48,21 +49,21 @@ while (!Raylib.WindowShouldClose()){
         break;
 
         case "game":
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_D) && c.player.x < (screenwidth - c.outfits[0].width) || Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT) && c.player.x < (screenwidth - 66))
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_D) && player.x < (screenwidth - c.outfits[0].width) || Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT) && player.x < (screenwidth - 66))
             {
-            c.player.x += speed;
+            player.x += speed;
             }
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_A) && c.player.x > 0 || Raylib.IsKeyDown(KeyboardKey.KEY_LEFT) && c.player.x > 0)
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_A) && player.x > 0 || Raylib.IsKeyDown(KeyboardKey.KEY_LEFT) && player.x > 0)
             {
-            c.player.x -= speed;
+            player.x -= speed;
             }
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_S) && c.player.y + c.outfits[0].height < screenheight || Raylib.IsKeyDown(KeyboardKey.KEY_DOWN) && c.player.y + 108 < screenheight)
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_S) && player.y + c.outfits[0].height < screenheight || Raylib.IsKeyDown(KeyboardKey.KEY_DOWN) && player.y + 108 < screenheight)
             {
-            c.player.y += speed;
+            player.y += speed;
             }
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_W) && c.player.y > 0 || Raylib.IsKeyDown(KeyboardKey.KEY_UP) && c.player.y > 0)
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_W) && player.y > 0 || Raylib.IsKeyDown(KeyboardKey.KEY_UP) && player.y > 0)
             {
-            c.player.y -= speed;
+            player.y -= speed;
             }
         break;
     }
@@ -88,7 +89,7 @@ while (!Raylib.WindowShouldClose()){
         break;
 
         case "game":
-            Raylib.DrawTexture(c.outfits[avatarShown], (int)c.player.x, (int)c.player.y, Color.WHITE);
+            Raylib.DrawTexture(c.outfits[avatarShown], (int)player.x, (int)player.y, Color.WHITE);
         break;
     }
 
