@@ -16,7 +16,28 @@ int avatarShown = 0;
 List<string> inventory = new();
 Rectangle player = new(0, 0, c.outfits[0].width, c.outfits[0].height);
 
-
+static float walkMechanicsX(float playerx, float speed){
+    if (Raylib.IsKeyDown(KeyboardKey.KEY_D) && playerx < (screenwidth - 66) || Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT) && playerx < (screenwidth - 66)) //66 i detta fall är bredden på spriten i pixlar och förhindrar spelaren från att gå utanför skärmen.
+    {
+        playerx += speed;
+    }
+    if (Raylib.IsKeyDown(KeyboardKey.KEY_A) && playerx > 0 || Raylib.IsKeyDown(KeyboardKey.KEY_LEFT) && playerx > 0)
+    {
+        playerx -= speed;
+    }
+    return playerx;
+}
+static float walkMechanicsY(float playery, float speed){
+    if (Raylib.IsKeyDown(KeyboardKey.KEY_S) && playery + 108 < screenheight || Raylib.IsKeyDown(KeyboardKey.KEY_DOWN) && playery + 108 < screenheight) //108 är höjden på spriten och förhindrar spelaren från att gå utanför skärmen
+    {
+        playery += speed;
+    }
+    if (Raylib.IsKeyDown(KeyboardKey.KEY_W) && playery > 0 || Raylib.IsKeyDown(KeyboardKey.KEY_UP) && playery > 0)
+    {
+        playery -= speed;
+    }
+    return playery;
+}
 
 
 ////////////////////////////////////////////////////////////
@@ -49,25 +70,10 @@ while (!Raylib.WindowShouldClose()){
         break;
 
         case "game":
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_D) && player.x < (screenwidth - c.outfits[0].width) || Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT) && player.x < (screenwidth - 66))
-            {
-            player.x += speed;
-            }
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_A) && player.x > 0 || Raylib.IsKeyDown(KeyboardKey.KEY_LEFT) && player.x > 0)
-            {
-            player.x -= speed;
-            }
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_S) && player.y + c.outfits[0].height < screenheight || Raylib.IsKeyDown(KeyboardKey.KEY_DOWN) && player.y + 108 < screenheight)
-            {
-            player.y += speed;
-            }
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_W) && player.y > 0 || Raylib.IsKeyDown(KeyboardKey.KEY_UP) && player.y > 0)
-            {
-            player.y -= speed;
-            }
+            player.x = walkMechanicsX(player.x, speed);
+            player.y = walkMechanicsY(player.y, speed);
         break;
     }
-
 
     
     //GRAFIK

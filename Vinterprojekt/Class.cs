@@ -10,7 +10,7 @@ class Character {
     outfits.Add(Raylib.LoadTexture("a4.png"));
     outfits.Add(Raylib.LoadTexture("a5.png"));
     outfits.Add(Raylib.LoadTexture("a6.png"));
-  }
+  } 
 }
 
 class Background {
