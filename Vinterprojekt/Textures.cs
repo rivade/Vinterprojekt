@@ -28,8 +28,17 @@ class Background {
 class NPC{
   public List<Rectangle> npcs = new();
   public List<Texture2D> npctexture = new();
-  public NPC(){
-    //npctexture.Add
+  public Rectangle npcrect = new(0, -300, 60, 108);
+  public Rectangle npcrect2 = new(-300, 325, 60, 108);
+
+  public NPC()
+  {
+  for (var i = 0; i < 2; i++){
+    npcs.Add(npcrect);
+  }
+  npctexture.Add(Raylib.LoadTexture("npc.png"));
+  npctexture.Add(Raylib.LoadTexture("npc2.png"));
+  npctexture.Add(Raylib.LoadTexture("npc3.png"));
   }
 }
 
