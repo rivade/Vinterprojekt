@@ -8,6 +8,8 @@ Raylib.SetTargetFPS(60);
 
 Character c = new();
 Background b = new();
+NPC n = new();
+Enemy e = new();
 
 string currentScene = "start";
 
@@ -15,6 +17,11 @@ float speed = 4.5f;
 int avatarShown = 0;
 List<string> inventory = new();
 Rectangle player = new(0, 0, c.outfits[0].width, c.outfits[0].height);
+Rectangle clothesstore = new(724, 568, 300, 200);
+Rectangle supermarket = new(724, 0, 300, 200);
+
+Vector2 enemyMovement = new Vector2(1, 0);
+float enemySpeed = 3;
 
 static float walkMechanicsX(float playerx, float speed){
     if (Raylib.IsKeyDown(KeyboardKey.KEY_D) && playerx < (screenwidth - 66) || Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT) && playerx < (screenwidth - 66)) //66 i detta fall är bredden på spriten i pixlar och förhindrar spelaren från att gå utanför skärmen.
@@ -40,13 +47,45 @@ static float walkMechanicsY(float playery, float speed){
 }
 
 
+
+
 ////////////////////////////////////////////////////////////
 while (!Raylib.WindowShouldClose()){
     //LOGIK
     switch (currentScene){ //Switch istället för massa if-satser rakt under varandra för varje currentScene
         case "start":
+            player.x = 0;
+            player.y = 0;
+            avatarShown = 0;
             if (Raylib.IsKeyDown(KeyboardKey.KEY_SPACE)){
+                currentScene = "mall";
+            }
+        break;
+
+        case "mall":
+            player.x = walkMechanicsX(player.x, speed);
+            player.y = walkMechanicsY(player.y, speed);
+            if (Raylib.CheckCollisionRecs(player, supermarket)){
+                currentScene = "supermarket";
+            }
+            if (Raylib.CheckCollisionRecs(player, clothesstore)){
                 currentScene = "charselect";
+            }
+            
+        break;
+
+        case "supermarket":
+            player.x = walkMechanicsX(player.x, speed);
+            player.y = walkMechanicsY(player.y, speed);
+            Vector2 playerPos = new Vector2(player.x, player.y);
+            Vector2 enemyPos = new Vector2(e.enemyRect.x, e.enemyRect.y);
+            Vector2 diff = playerPos - enemyPos;
+            Vector2 enemyDirection = Vector2.Normalize(diff);
+            enemyMovement = enemyDirection * enemySpeed;
+            e.enemyRect.x += enemyMovement.X;
+            e.enemyRect.y += enemyMovement.Y;
+            if (Raylib.CheckCollisionRecs(player, e.enemyRect)){
+                currentScene = "gameover";
             }
         break;
 
@@ -54,24 +93,32 @@ while (!Raylib.WindowShouldClose()){
             if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT)){
                 if (avatarShown < 5){
                     avatarShown++;
-                    System.Threading.Thread.Sleep(150); //Förhindrar applikationen från att bläddra medans piltangenten är nedtryckt så man hinner reagera
+                    System.Threading.Thread.Sleep(175); //Förhindrar applikationen från att bläddra medans piltangenten är nedtryckt så man hinner reagera
                 }
             }
             if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT)){
                 if (avatarShown > 0){
                     avatarShown--;
-                    System.Threading.Thread.Sleep(150);
+                    System.Threading.Thread.Sleep(175);
                 }
             }
 
             if(Raylib.IsKeyDown(KeyboardKey.KEY_ENTER)){
-                currentScene = "game";
+                player.x = 0;
+                player.y = 0;
+                currentScene = "mall";
             }
         break;
 
         case "game":
             player.x = walkMechanicsX(player.x, speed);
             player.y = walkMechanicsY(player.y, speed);
+        break;
+
+        case "gameover":
+            if(Raylib.IsKeyDown(KeyboardKey.KEY_ENTER)){
+                currentScene = "start";
+            }
         break;
     }
 
@@ -87,8 +134,23 @@ while (!Raylib.WindowShouldClose()){
             Raylib.DrawText("Press SPACE to start", 325, 425, 32, Color.BLACK);
         break;
 
-        case "charselect":
+        case "mall":
             Raylib.DrawTexture(b.backgrounds[1], 0, 0, Color.WHITE);
+            Raylib.DrawTexture(b.backgrounds[3], 724, 0, Color.WHITE);
+            Raylib.DrawText("Supermarket", 780, 65, 30, Color.BLACK);
+            Raylib.DrawText("(Enter to steal)", 780, 100, 20, Color.BLACK);
+            Raylib.DrawTexture(b.backgrounds[4], 724, 568, Color.WHITE);
+            Raylib.DrawText("Clothing Store", 760, 650, 30, Color.BLACK);
+            Raylib.DrawTexture(c.outfits[avatarShown], (int)player.x, (int)player.y, Color.WHITE);
+        break;
+
+        case "supermarket":
+            Raylib.DrawTexture(c.outfits[avatarShown], (int)player.x, (int)player.y, Color.WHITE);
+            Raylib.DrawTexture(e.enemyImage, (int)e.enemyRect.x, (int)e.enemyRect.y, Color.WHITE);
+        break;
+
+        case "charselect":
+            Raylib.DrawTexture(b.backgrounds[2], 0, 0, Color.WHITE);
             Raylib.DrawText("SELECT YOUR OUTFIT", 250, 300, 50, Color.WHITE);
             Raylib.DrawText("(right or left arrow)", 375, 375, 30, Color.WHITE);
             Raylib.DrawTexture(c.outfits[avatarShown], 485, 550, Color.WHITE);
@@ -96,6 +158,11 @@ while (!Raylib.WindowShouldClose()){
 
         case "game":
             Raylib.DrawTexture(c.outfits[avatarShown], (int)player.x, (int)player.y, Color.WHITE);
+        break;
+
+        case "gameover":
+            Raylib.DrawText("Game Over!", 400, 300, 30, Color.BLACK);
+            Raylib.DrawText("Press ENTER to start over", 400, 400, 20, Color.BLACK);
         break;
     }
 

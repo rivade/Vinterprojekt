@@ -15,17 +15,25 @@ class Character {
 
 class Background {
   public List<Texture2D> backgrounds = new();
-  public Background() //Döpt till samma som klassen, så koden körs varje gång en instans skapas
+  public Background()
   {
     backgrounds.Add(Raylib.LoadTexture("titlescreen.png"));
+    backgrounds.Add(Raylib.LoadTexture("mall.png"));
     backgrounds.Add(Raylib.LoadTexture("charselectbg.png"));
+    backgrounds.Add(Raylib.LoadTexture("supermarket.png"));
+    backgrounds.Add(Raylib.LoadTexture("clothingstore.png"));
   }
 }
 
-class Door{
-  public List<Rectangle> doors = new();
-  // foreach (door d in doors)
-  // {
-    
-  // }
+class NPC{
+  public List<Rectangle> npcs = new();
+  public List<Texture2D> npctexture = new();
+  public NPC(){
+    //npctexture.Add
+  }
+}
+
+class Enemy{
+  public Texture2D enemyImage = Raylib.LoadTexture("cop.png");
+  public Rectangle enemyRect = new(700, 500, 60, 148);
 }
