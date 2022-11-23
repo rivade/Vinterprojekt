@@ -12,22 +12,25 @@ Background b = new();
 NPC n = new();
 Enemy e = new();
 
-Random npcgenerator = new();
-int npcoutfit = npcgenerator.Next(n.npctexture.Count);
-int npcoutfit1 = npcgenerator.Next(n.npctexture.Count);
-int npcoutfit2 = npcgenerator.Next(n.npctexture.Count);
+Random rnd = new();
+int npcoutfit = rnd.Next(n.npctexture.Count);
+int npcoutfit1 = rnd.Next(n.npctexture.Count);
+int npcoutfit2 = rnd.Next(n.npctexture.Count);
 
 string currentScene = "start";
 
 float speed = 4.5f;
 int avatarShown = 0;
 Vector2 enemyMovement = new Vector2(1, 0);
-float enemySpeed = 3;
-List<string> inventory = new();
+float enemySpeed = 2f;
+bool itemactive = false;
+List<int> inventory = new();
 Rectangle player = new(0, 0, c.outfits[0].width, c.outfits[0].height);
 Rectangle clothesstore = new(724, 568, 300, 200);
 Rectangle supermarket = new(724, 0, 300, 200);
+Rectangle item = new(0, 0, 50, 50);
 
+Texture2D itempic = Raylib.LoadTexture("item.png");
 
 static float walkMechanicsX(float playerx, float speed)
 {
@@ -56,7 +59,6 @@ static float walkMechanicsY(float playery, float speed)
 
 
 
-
 ////////////////////////////////////////////////////////////
 while (!Raylib.WindowShouldClose())
 {
@@ -67,7 +69,9 @@ while (!Raylib.WindowShouldClose())
             player.x = 0;
             player.y = 0;
             avatarShown = 0;
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_SPACE))
+            enemySpeed = 2f;
+            inventory.Clear();
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE))
             {
                 currentScene = "mall";
             }
@@ -78,31 +82,43 @@ while (!Raylib.WindowShouldClose())
             player.y = walkMechanicsY(player.y, speed);
             if (Raylib.CheckCollisionRecs(player, supermarket))
             {
-                currentScene = "supermarket";
+                currentScene = "loading";
             }
             if (Raylib.CheckCollisionRecs(player, clothesstore))
             {
                 currentScene = "charselect";
             }
+
+            //NPCS
             for (var i = 0; i < 2; i++) //Skapar en rektangel för varje föremål i listan n.npcs
             {
                 Rectangle r = n.npcs[i];
                 r.x = (i + 1) * 200; //Gör så att varje rektangel får ett x värde i en rad
-                r.y += speed;
+                r.y += (speed/2);
                 if (r.y >= 768){
                     r.y = -300;
-                    npcoutfit = npcgenerator.Next(3);
-                    npcoutfit1 = npcgenerator.Next(3);
+                    npcoutfit = rnd.Next(n.npctexture.Count); //Byter sprite på NPCn så att det ser ut som en annan som går
+                    npcoutfit1 = rnd.Next(n.npctexture.Count);
                 }
                 n.npcs[i] = r; //Applicerar de nya x och y värderna på rektanglarna i listan npcs.
             }
             Rectangle r2 = n.npcrect2;
-            r2.x += speed;
+            r2.x += (speed/2);
             if (r2.x >= 1024){
                 r2.x = -300;
-                npcoutfit2 = npcgenerator.Next(3);
+                npcoutfit2 = rnd.Next(n.npctexture.Count);
             }
             n.npcrect2 = r2;
+            //NPCS
+        break;
+
+        case "loading":
+            player.x = 0;
+            player.y = 0;
+            e.enemyRect.x = 700;
+            e.enemyRect.y = 500;
+            System.Threading.Thread.Sleep(7500); //Simulerar en loading screen men ger egentligen bara spelaren tid att läsa instruktioner
+            currentScene = "supermarket";
         break;
 
         case "supermarket":
@@ -115,37 +131,51 @@ while (!Raylib.WindowShouldClose())
             enemyMovement = enemyDirection * enemySpeed;
             e.enemyRect.x += enemyMovement.X;
             e.enemyRect.y += enemyMovement.Y;
+            if (!itemactive){ //Flyttar föremålet till en random plats när man plockar upp den
+                item.x = rnd.Next(1, 975);
+                item.y = rnd.Next(1, 719);
+                itemactive = true;
+            }
+            if(Raylib.CheckCollisionRecs(player, item)){
+                inventory.Add(rnd.Next(50, 101));
+                enemySpeed += 0.1f;
+                itemactive = false;
+            }
             if (Raylib.CheckCollisionRecs(player, e.enemyRect))
             {
                 currentScene = "gameover";
             }
-            break;
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER)){
+                Console.WriteLine(inventory.Sum());
+                player.x = 0;
+                player.y = 0;
+                currentScene = "mall";
+            }
+        break;
 
         case "charselect":
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT))
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT))
             {
                 if (avatarShown < 5)
                 {
                     avatarShown++;
-                    System.Threading.Thread.Sleep(175); //Förhindrar applikationen från att bläddra medans piltangenten är nedtryckt så man hinner reagera
                 }
             }
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT))
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT))
             {
                 if (avatarShown > 0)
                 {
                     avatarShown--;
-                    System.Threading.Thread.Sleep(175);
                 }
             }
 
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_ENTER))
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
             {
                 player.x = 0;
                 player.y = 0;
                 currentScene = "mall";
             }
-            break;
+        break;
 
         case "game":
             player.x = walkMechanicsX(player.x, speed);
@@ -153,11 +183,11 @@ while (!Raylib.WindowShouldClose())
             break;
 
         case "gameover":
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_ENTER))
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
             {
                 currentScene = "start";
             }
-            break;
+        break;
     }
 
 
@@ -186,9 +216,19 @@ while (!Raylib.WindowShouldClose())
             Raylib.DrawTexture(c.outfits[avatarShown], (int)player.x, (int)player.y, Color.WHITE);
         break;
 
+        case "loading":
+            Raylib.DrawTexture(b.backgrounds[0], 0, 0, Color.WHITE);
+            Raylib.DrawText("Loading Supermarket", 250, 325, 50, Color.BLACK);
+            Raylib.DrawText("Steal as much stuff as you can!", 255, 375, 32, Color.BLACK);
+            Raylib.DrawText("Don't get caught by the guard!", 260, 400, 32, Color.BLACK);
+            Raylib.DrawText("Press ENTER to exit the store.", 260, 425, 32, Color.BLACK);
+        break;
+
         case "supermarket":
+            Raylib.DrawTexture(b.backgrounds[5], 0, 0, Color.WHITE);
             Raylib.DrawTexture(c.outfits[avatarShown], (int)player.x, (int)player.y, Color.WHITE);
             Raylib.DrawTexture(e.enemyImage, (int)e.enemyRect.x, (int)e.enemyRect.y, Color.WHITE);
+            Raylib.DrawTexture(itempic, (int)item.x, (int)item.y, Color.WHITE);
         break;
 
         case "charselect":

@@ -22,6 +22,7 @@ class Background {
     backgrounds.Add(Raylib.LoadTexture("charselectbg.png"));
     backgrounds.Add(Raylib.LoadTexture("supermarket.png"));
     backgrounds.Add(Raylib.LoadTexture("clothingstore.png"));
+    backgrounds.Add(Raylib.LoadTexture("storefloor.png"));
   }
 }
 
@@ -39,6 +40,7 @@ class NPC{
   npctexture.Add(Raylib.LoadTexture("npc.png"));
   npctexture.Add(Raylib.LoadTexture("npc2.png"));
   npctexture.Add(Raylib.LoadTexture("npc3.png"));
+  npctexture.Add(Raylib.LoadTexture("npc4.png"));
   }
 }
 
