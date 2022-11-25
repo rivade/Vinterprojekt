@@ -4,12 +4,12 @@ class Character {
   public List<Texture2D> outfits = new();
   public Character() //Döpt till samma som klassen, så koden körs varje gång en instans skapas
   {
-    outfits.Add(Raylib.LoadTexture("a1.png"));
-    outfits.Add(Raylib.LoadTexture("a2.png"));
-    outfits.Add(Raylib.LoadTexture("a3.png"));
-    outfits.Add(Raylib.LoadTexture("a4.png"));
-    outfits.Add(Raylib.LoadTexture("a5.png"));
-    outfits.Add(Raylib.LoadTexture("a6.png"));
+    outfits.Add(Raylib.LoadTexture("Characters/a1.png"));
+    outfits.Add(Raylib.LoadTexture("Characters/a2.png"));
+    outfits.Add(Raylib.LoadTexture("Characters/a3.png"));
+    outfits.Add(Raylib.LoadTexture("Characters/a4.png"));
+    outfits.Add(Raylib.LoadTexture("Characters/a5.png"));
+    outfits.Add(Raylib.LoadTexture("Characters/a6.png"));
   } 
 }
 
@@ -17,12 +17,12 @@ class Background {
   public List<Texture2D> backgrounds = new();
   public Background()
   {
-    backgrounds.Add(Raylib.LoadTexture("titlescreen.png"));
-    backgrounds.Add(Raylib.LoadTexture("mall.png"));
-    backgrounds.Add(Raylib.LoadTexture("charselectbg.png"));
-    backgrounds.Add(Raylib.LoadTexture("supermarket.png"));
-    backgrounds.Add(Raylib.LoadTexture("clothingstore.png"));
-    backgrounds.Add(Raylib.LoadTexture("storefloor.png"));
+    backgrounds.Add(Raylib.LoadTexture("Backgrounds/titlescreen.png"));
+    backgrounds.Add(Raylib.LoadTexture("Backgrounds/mall.png"));
+    backgrounds.Add(Raylib.LoadTexture("Backgrounds/charselectbg.png"));
+    backgrounds.Add(Raylib.LoadTexture("Backgrounds/supermarket.png"));
+    backgrounds.Add(Raylib.LoadTexture("Backgrounds/clothingstore.png"));
+    backgrounds.Add(Raylib.LoadTexture("Backgrounds/storefloor.png"));
   }
 }
 
@@ -37,14 +37,19 @@ class NPC{
   for (var i = 0; i < 2; i++){
     npcs.Add(npcrect);
   }
-  npctexture.Add(Raylib.LoadTexture("npc.png"));
-  npctexture.Add(Raylib.LoadTexture("npc2.png"));
-  npctexture.Add(Raylib.LoadTexture("npc3.png"));
-  npctexture.Add(Raylib.LoadTexture("npc4.png"));
+  npctexture.Add(Raylib.LoadTexture("NPCTextures/npc.png"));
+  npctexture.Add(Raylib.LoadTexture("NPCTextures/npc2.png"));
+  npctexture.Add(Raylib.LoadTexture("NPCTextures/npc3.png"));
+  npctexture.Add(Raylib.LoadTexture("NPCTextures/npc4.png"));
+  npctexture.Add(Raylib.LoadTexture("NPCTextures/npc5.png"));
   }
 }
 
 class Enemy{
-  public Texture2D enemyImage = Raylib.LoadTexture("cop.png");
+  public Texture2D enemyImage = Raylib.LoadTexture("Characters/cop.png");
   public Rectangle enemyRect = new(700, 500, 60, 148);
+}
+
+class Item{
+
 }
