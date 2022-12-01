@@ -23,6 +23,9 @@ class Background {
     backgrounds.Add(Raylib.LoadTexture("Backgrounds/supermarket.png"));
     backgrounds.Add(Raylib.LoadTexture("Backgrounds/clothingstore.png"));
     backgrounds.Add(Raylib.LoadTexture("Backgrounds/storefloor.png"));
+    backgrounds.Add(Raylib.LoadTexture("Backgrounds/market.png"));
+    backgrounds.Add(Raylib.LoadTexture("Backgrounds/jail.png"));
+    backgrounds.Add(Raylib.LoadTexture("Backgrounds/marketbg.png"));
   }
 }
 
@@ -42,6 +45,9 @@ class NPC{
   npctexture.Add(Raylib.LoadTexture("NPCTextures/npc3.png"));
   npctexture.Add(Raylib.LoadTexture("NPCTextures/npc4.png"));
   npctexture.Add(Raylib.LoadTexture("NPCTextures/npc5.png"));
+  npctexture.Add(Raylib.LoadTexture("NPCTextures/npc6.png"));
+  npctexture.Add(Raylib.LoadTexture("NPCTextures/npc7.png"));
+  npctexture.Add(Raylib.LoadTexture("NPCTextures/npc8.png"));
   }
 }
 
@@ -51,5 +57,13 @@ class Enemy{
 }
 
 class Item{
-
+  public List<Texture2D> items = new();
+  public Item(){
+    items.Add(Raylib.LoadTexture("Items/lock.png"));
+    items.Add(Raylib.LoadTexture("Items/item.png"));
+    items.Add(Raylib.LoadTexture("Items/item2.png"));
+    items.Add(Raylib.LoadTexture("Items/item3.png"));
+    items.Add(Raylib.LoadTexture("Items/item4.png"));
+    items.Add(Raylib.LoadTexture("Items/item5.png"));
+  }
 }

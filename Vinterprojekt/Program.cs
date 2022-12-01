@@ -11,6 +11,7 @@ Character c = new();
 Background b = new();
 NPC n = new();
 Enemy e = new();
+Item f = new();
 
 Random rnd = new();
 int npcOutfit = rnd.Next(n.npctexture.Count);
@@ -21,6 +22,7 @@ string currentScene = "start";
 
 float speed = 4.5f;
 int avatarShown = 0;
+int itemTexture = 0;
 Vector2 enemyMovement = new Vector2(1, 0);
 float enemySpeed = 2f;
 bool itemActive = false;
@@ -28,9 +30,13 @@ List<int> inventory = new();
 Rectangle player = new(0, 0, c.outfits[0].width, c.outfits[0].height);
 Rectangle clothesStore = new(724, 568, 300, 200);
 Rectangle supermarket = new(724, 0, 300, 200);
+Rectangle market = new(0, 568, 300, 200);
 Rectangle item = new(0, 0, 50, 50);
 
-Texture2D itemPic = Raylib.LoadTexture("item.png");
+Camera2D camera = new Camera2D();
+camera.zoom = 1;
+camera.rotation = 0;
+camera.offset = new Vector2(screenwidth/2, screenheight/2);
 
 static float WalkMechanicsX(float playerx, float speed)
 {
@@ -56,20 +62,30 @@ static float WalkMechanicsY(float playery, float speed)
     }
     return playery;
 }
-
-
+static float WalkMechanicsY2(float playery, float speed)
+{
+    if (Raylib.IsKeyDown(KeyboardKey.KEY_S) || Raylib.IsKeyDown(KeyboardKey.KEY_DOWN))
+    {
+        playery += speed;
+    }
+    if (Raylib.IsKeyDown(KeyboardKey.KEY_W) && playery > 333 || Raylib.IsKeyDown(KeyboardKey.KEY_UP) && playery > 333)
+    {
+        playery -= speed;
+    }
+    return playery;
+}
 
 ////////////////////////////////////////////////////////////
 while (!Raylib.WindowShouldClose())
 {
     //LOGIK
-    switch (currentScene)
-    { //Switch istället för massa if-satser rakt under varandra för varje currentScene
+    switch (currentScene) //Switch istället för massa if-satser rakt under varandra för varje currentScene
+    {
         case "start":
             player.x = 0;
             player.y = 0;
             avatarShown = 0;
-            enemySpeed = 2f;
+            enemySpeed = 2f; //Återställer alla dessa värden till deras ursprung varje gång man kommer till start-screen
             inventory.Clear();
             if (Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE))
             {
@@ -88,12 +104,21 @@ while (!Raylib.WindowShouldClose())
             {
                 currentScene = "charselect";
             }
+            if (Raylib.CheckCollisionRecs(player, market)){
+                if (inventory.Count != 0){
+                    currentScene = "market";
+                    player.x = screenwidth/2;
+                    player.y = 455;
+                    market.x = (screenheight/2);
+                    market.y = 440 - market.height;
+                }
+            }
 
             //NPCS
             for (var i = 0; i < 2; i++) //Skapar en rektangel för två npcs
             {
                 Rectangle r = n.npcs[i];
-                r.x = (i + 1) * 300; //Gör så att varje rektangel får ett x värde i en rad
+                r.x = (i + 1) * 310; //Gör så att varje rektangel får ett x värde i en rad
                 r.y += (speed/2);
                 if (r.y >= 768){
                     r.y = -300;
@@ -134,6 +159,7 @@ while (!Raylib.WindowShouldClose())
             if (!itemActive){ //Flyttar föremålet till en random plats när man plockar upp den
                 item.x = rnd.Next(1, 975);
                 item.y = rnd.Next(1, 719);
+                itemTexture = rnd.Next(1, f.items.Count);
                 itemActive = true;
             }
             if(Raylib.CheckCollisionRecs(player, item)){
@@ -183,12 +209,26 @@ while (!Raylib.WindowShouldClose())
                 currentScene = "start";
             }
         break;
+
+        case "market":
+            player.x = WalkMechanicsX(player.x, speed);
+            player.y = WalkMechanicsY2(player.y, speed);
+            camera.target = new Vector2((screenwidth/2), player.y);
+            if (Raylib.CheckCollisionRecs(player, market)){
+                currentScene = "mall";
+                player.x = 0;
+                player.y = 0;
+                market.x = 0;
+                market.y = 568;
+            }
+        break;
     }
 
 
     //GRAFIK
     Raylib.BeginDrawing();
     Raylib.ClearBackground(Color.WHITE);
+
 
     switch (currentScene)
     {
@@ -205,6 +245,11 @@ while (!Raylib.WindowShouldClose())
             Raylib.DrawText("(Enter to steal)", 780, 100, 20, Color.BLACK);
             Raylib.DrawTexture(b.backgrounds[4], 724, 568, Color.WHITE);
             Raylib.DrawText("Clothing Store", 760, 650, 30, Color.BLACK);
+            Raylib.DrawTexture(b.backgrounds[6], 0, 568, Color.WHITE);
+            Raylib.DrawText("Market", 100, 600, 30, Color.BLACK);
+            if (inventory.Count() == 0){
+                Raylib.DrawTexture(f.items[0], 125, 650, Color.WHITE);
+            }
             Raylib.DrawTexture(n.npctexture[npcOutfit], (int)n.npcs[0].x, (int)n.npcs[0].y, Color.WHITE);
             Raylib.DrawTexture(n.npctexture[npcOutfit1], (int)n.npcs[1].x, (int)n.npcs[1].y, Color.WHITE);
             Raylib.DrawTexture(n.npctexture[npcOutfit2], (int)n.npcrect2.x, (int)n.npcrect2.y, Color.WHITE);
@@ -221,10 +266,10 @@ while (!Raylib.WindowShouldClose())
 
         case "supermarket":
             Raylib.DrawTexture(b.backgrounds[5], 0, 0, Color.WHITE);
+            Raylib.DrawTexture(f.items[itemTexture], (int)item.x, (int)item.y, Color.WHITE);
             Raylib.DrawTexture(c.outfits[avatarShown], (int)player.x, (int)player.y, Color.WHITE);
             Raylib.DrawTexture(e.enemyImage, (int)e.enemyRect.x, (int)e.enemyRect.y, Color.WHITE);
-            Raylib.DrawTexture(itemPic, (int)item.x, (int)item.y, Color.WHITE);
-            Raylib.DrawText("Items picked up: " + inventory.Count(), 0, 0, 25, Color.BLACK);
+            Raylib.DrawText($"Items picked up: {inventory.Count}", 0, 0, 25, Color.BLACK);
         break;
 
         case "charselect":
@@ -235,10 +280,17 @@ while (!Raylib.WindowShouldClose())
         break;
 
         case "gameover":
-            Raylib.DrawText("Game Over!", 400, 300, 40, Color.BLACK);
-            Raylib.DrawText("Press ENTER to start over", 400, 400, 30, Color.BLACK);
+            Raylib.DrawTexture(b.backgrounds[7], 0, 0, Color.WHITE);
+            Raylib.DrawTexture(c.outfits[avatarShown], 400, 550, Color.WHITE);
+            Raylib.DrawText("Busted!", 400, 350, 50, Color.RED);
+        break;
+
+        case "market":
+            Raylib.BeginMode2D(camera);
+            Raylib.DrawTexture(b.backgrounds[8], 0, 0, Color.WHITE);
+            Raylib.DrawTexture(c.outfits[avatarShown], (int)player.x, (int)player.y, Color.WHITE);
+            Raylib.EndMode2D();
         break;
     }
-
     Raylib.EndDrawing();
 }
