@@ -26,6 +26,7 @@ class Background {
     backgrounds.Add(Raylib.LoadTexture("Backgrounds/market.png"));
     backgrounds.Add(Raylib.LoadTexture("Backgrounds/jail.png"));
     backgrounds.Add(Raylib.LoadTexture("Backgrounds/marketbg.png"));
+    backgrounds.Add(Raylib.LoadTexture("Backgrounds/vendor.png"));
   }
 }
 
@@ -65,5 +66,6 @@ class Item{
     items.Add(Raylib.LoadTexture("Items/item3.png"));
     items.Add(Raylib.LoadTexture("Items/item4.png"));
     items.Add(Raylib.LoadTexture("Items/item5.png"));
+    items.Add(Raylib.LoadTexture("Items/item6.png"));
   }
 }

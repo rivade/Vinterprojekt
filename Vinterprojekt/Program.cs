@@ -26,14 +26,23 @@ int itemTexture = 0;
 Vector2 enemyMovement = new Vector2(1, 0);
 float enemySpeed = 2f;
 bool itemActive = false;
+bool marketLock = true;
+bool sold = false;
 List<int> inventory = new();
+inventory.Add(20);
+inventory.Add(36);
+int balance = 0;
+
+Texture2D vendorTexture = Raylib.LoadTexture("NPCTextures/vendor.png");
+
 Rectangle player = new(0, 0, c.outfits[0].width, c.outfits[0].height);
 Rectangle clothesStore = new(724, 568, 300, 200);
 Rectangle supermarket = new(724, 0, 300, 200);
 Rectangle market = new(0, 568, 300, 200);
 Rectangle item = new(0, 0, 50, 50);
+Rectangle vendor = new(0, 750, vendorTexture.width, vendorTexture.height);
 
-Camera2D camera = new Camera2D();
+Camera2D camera = new();
 camera.zoom = 1;
 camera.rotation = 0;
 camera.offset = new Vector2(screenwidth/2, screenheight/2);
@@ -64,7 +73,7 @@ static float WalkMechanicsY(float playery, float speed)
 }
 static float WalkMechanicsY2(float playery, float speed)
 {
-    if (Raylib.IsKeyDown(KeyboardKey.KEY_S) || Raylib.IsKeyDown(KeyboardKey.KEY_DOWN))
+    if (Raylib.IsKeyDown(KeyboardKey.KEY_S) && playery <= 1621 || Raylib.IsKeyDown(KeyboardKey.KEY_DOWN) && playery <= 1621)
     {
         playery += speed;
     }
@@ -105,7 +114,7 @@ while (!Raylib.WindowShouldClose())
                 currentScene = "charselect";
             }
             if (Raylib.CheckCollisionRecs(player, market)){
-                if (inventory.Count != 0){
+                if (!marketLock){
                     currentScene = "market";
                     player.x = screenwidth/2;
                     player.y = 455;
@@ -166,13 +175,13 @@ while (!Raylib.WindowShouldClose())
                 inventory.Add(rnd.Next(50, 101));
                 enemySpeed += 0.1f;
                 itemActive = false;
+                marketLock = false;
             }
             if (Raylib.CheckCollisionRecs(player, e.enemyRect))
             {
                 currentScene = "gameover";
             }
             if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER)){
-                Console.WriteLine(inventory.Sum());
                 player.x = 0;
                 player.y = 0;
                 currentScene = "mall";
@@ -213,7 +222,9 @@ while (!Raylib.WindowShouldClose())
         case "market":
             player.x = WalkMechanicsX(player.x, speed);
             player.y = WalkMechanicsY2(player.y, speed);
-            camera.target = new Vector2((screenwidth/2), player.y);
+            if(player.y >= 392 && player.y <= 1346){
+                camera.target = new Vector2((screenwidth/2), player.y);
+            }
             if (Raylib.CheckCollisionRecs(player, market)){
                 currentScene = "mall";
                 player.x = 0;
@@ -221,13 +232,32 @@ while (!Raylib.WindowShouldClose())
                 market.x = 0;
                 market.y = 568;
             }
+            if (Raylib.CheckCollisionRecs(player, vendor)){
+                currentScene = "sell";
+            }
+        break;
+
+        case "sell":
+            if (inventory.Count() != 0){
+                if (Raylib.IsKeyPressed(KeyboardKey.KEY_Y)){
+                    balance += inventory.Sum();
+                    inventory.Clear();
+                    sold = true;
+                }
+            }
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_N) && inventory.Count() != 0 || Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER) && inventory.Count == 0){
+                sold = false;
+                player.x = 206;
+                player.y = 820;
+                currentScene = "market";
+            }
         break;
     }
 
 
     //GRAFIK
     Raylib.BeginDrawing();
-    Raylib.ClearBackground(Color.WHITE);
+    Raylib.ClearBackground(Color.BLACK);
 
 
     switch (currentScene)
@@ -247,7 +277,7 @@ while (!Raylib.WindowShouldClose())
             Raylib.DrawText("Clothing Store", 760, 650, 30, Color.BLACK);
             Raylib.DrawTexture(b.backgrounds[6], 0, 568, Color.WHITE);
             Raylib.DrawText("Market", 100, 600, 30, Color.BLACK);
-            if (inventory.Count() == 0){
+            if (marketLock){
                 Raylib.DrawTexture(f.items[0], 125, 650, Color.WHITE);
             }
             Raylib.DrawTexture(n.npctexture[npcOutfit], (int)n.npcs[0].x, (int)n.npcs[0].y, Color.WHITE);
@@ -288,9 +318,32 @@ while (!Raylib.WindowShouldClose())
         case "market":
             Raylib.BeginMode2D(camera);
             Raylib.DrawTexture(b.backgrounds[8], 0, 0, Color.WHITE);
+            Raylib.DrawTexture(vendorTexture, (int)vendor.x, (int)vendor.y, Color.WHITE);
             Raylib.DrawTexture(c.outfits[avatarShown], (int)player.x, (int)player.y, Color.WHITE);
             Raylib.EndMode2D();
         break;
+
+        case "sell":
+            Raylib.DrawTexture(b.backgrounds[9], 0, 0, Color.WHITE);
+            Raylib.DrawText("BALANCE:", 800, 625, 32, Color.GOLD);
+            Raylib.DrawText($"{balance}$", 800, 675, 38, Color.GOLD);
+            if (inventory.Count() == 0 && sold == false){
+                Raylib.DrawText("Your inventory is empty!", 25, 600, 32, Color.WHITE);
+                Raylib.DrawText("Press ENTER to leave", 25, 650, 32, Color.WHITE);
+            }
+            else{
+                if (sold){
+                    Raylib.DrawText("Sold!", 25, 600, 32, Color.WHITE);
+                    Raylib.DrawText("Press ENTER to leave", 25, 650, 32, Color.WHITE);
+                }
+                else{
+                    Raylib.DrawText($"Would you like to sell your items for {inventory.Sum()}$?", 25, 550, 32, Color.WHITE);
+                    Raylib.DrawText("Press Y for yes", 25, 675, 32, Color.WHITE);
+                    Raylib.DrawText("Press N for no", 25, 725, 32, Color.WHITE);
+                }
+            }
+        break;
     }
     Raylib.EndDrawing();
+    Console.WriteLine($"Y = {player.y} X= {player.x}");
 }
