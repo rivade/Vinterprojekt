@@ -27,6 +27,7 @@ class Background {
     backgrounds.Add(Raylib.LoadTexture("Backgrounds/jail.png"));
     backgrounds.Add(Raylib.LoadTexture("Backgrounds/marketbg.png"));
     backgrounds.Add(Raylib.LoadTexture("Backgrounds/vendor.png"));
+    backgrounds.Add(Raylib.LoadTexture("Backgrounds/taxi.png"));
   }
 }
 

@@ -23,17 +23,28 @@ string currentScene = "start";
 float speed = 4.5f;
 int avatarShown = 0;
 int itemTexture = 0;
+int timer = 0;
+bool timerActive = false;
 Vector2 enemyMovement = new Vector2(1, 0);
 float enemySpeed = 2f;
 bool itemActive = false;
 bool marketLock = true;
 bool sold = false;
+bool sufficientFunds = true;
+bool ending = false;
 List<int> inventory = new();
 inventory.Add(20);
-inventory.Add(36);
+inventory.Add(1036);
 int balance = 0;
 
+Color alpha = new(255, 255, 255, 0);
+int alphaVariable = 0;
+
 Texture2D vendorTexture = Raylib.LoadTexture("NPCTextures/vendor.png");
+Texture2D taxiTexture = Raylib.LoadTexture("Items/taxi.png");
+
+Texture2D blackScreen = Raylib.LoadTexture("Backgrounds/black.png");
+
 
 Rectangle player = new(0, 0, c.outfits[0].width, c.outfits[0].height);
 Rectangle clothesStore = new(724, 568, 300, 200);
@@ -41,6 +52,7 @@ Rectangle supermarket = new(724, 0, 300, 200);
 Rectangle market = new(0, 568, 300, 200);
 Rectangle item = new(0, 0, 50, 50);
 Rectangle vendor = new(0, 750, vendorTexture.width, vendorTexture.height);
+Rectangle taxi = new((screenwidth/2) - (taxiTexture.width/2), 1725 - taxiTexture.height, taxiTexture.width, taxiTexture.height);
 
 Camera2D camera = new();
 camera.zoom = 1;
@@ -88,16 +100,23 @@ static float WalkMechanicsY2(float playery, float speed)
 while (!Raylib.WindowShouldClose())
 {
     //LOGIK
+    if(timerActive){
+        timer++;
+    }
     switch (currentScene) //Switch istället för massa if-satser rakt under varandra för varje currentScene
     {
         case "start":
             player.x = 0;
             player.y = 0;
             avatarShown = 0;
-            enemySpeed = 2f; //Återställer alla dessa värden till deras ursprung varje gång man kommer till start-screen
-            inventory.Clear();
+            enemySpeed = 2f;
+            balance = 0;
+            timer = 0;
+            timerActive = false;
+            inventory.Clear(); //Återställer alla dessa värden till deras ursprung varje gång man kommer till start-screen
             if (Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE))
             {
+                timerActive = true;
                 currentScene = "mall";
             }
         break;
@@ -235,6 +254,9 @@ while (!Raylib.WindowShouldClose())
             if (Raylib.CheckCollisionRecs(player, vendor)){
                 currentScene = "sell";
             }
+            if (Raylib.CheckCollisionRecs(player, taxi)){
+                currentScene = "taxi";
+            }
         break;
 
         case "sell":
@@ -250,6 +272,35 @@ while (!Raylib.WindowShouldClose())
                 player.x = 206;
                 player.y = 820;
                 currentScene = "market";
+            }
+        break;
+
+        case "taxi":
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_Y)){
+                if (balance < 1000){
+                    sufficientFunds = false;
+                }
+                else{
+                    balance -= 1000;
+                    ending = true;
+                }
+            }
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_N) || Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER) && !sufficientFunds){
+                sufficientFunds = true;
+                player.x = 475;
+                player.y = 1445;
+                currentScene = "market";
+            }
+            if (ending){
+                timerActive = false;
+                if (alphaVariable < 255){
+                    alphaVariable++;
+                }
+                alpha.a = (byte)alphaVariable;
+            }
+            if (alphaVariable == 255){
+                ending = false;
+                currentScene = "endscene";
             }
         break;
     }
@@ -319,6 +370,7 @@ while (!Raylib.WindowShouldClose())
             Raylib.BeginMode2D(camera);
             Raylib.DrawTexture(b.backgrounds[8], 0, 0, Color.WHITE);
             Raylib.DrawTexture(vendorTexture, (int)vendor.x, (int)vendor.y, Color.WHITE);
+            Raylib.DrawTexture(taxiTexture, (int)taxi.x, (int)taxi.y, Color.WHITE);
             Raylib.DrawTexture(c.outfits[avatarShown], (int)player.x, (int)player.y, Color.WHITE);
             Raylib.EndMode2D();
         break;
@@ -326,7 +378,7 @@ while (!Raylib.WindowShouldClose())
         case "sell":
             Raylib.DrawTexture(b.backgrounds[9], 0, 0, Color.WHITE);
             Raylib.DrawText("BALANCE:", 800, 625, 32, Color.GOLD);
-            Raylib.DrawText($"{balance}$", 800, 675, 38, Color.GOLD);
+            Raylib.DrawText($"${balance}", 800, 675, 38, Color.GOLD);
             if (inventory.Count() == 0 && sold == false){
                 Raylib.DrawText("Your inventory is empty!", 25, 600, 32, Color.WHITE);
                 Raylib.DrawText("Press ENTER to leave", 25, 650, 32, Color.WHITE);
@@ -337,13 +389,38 @@ while (!Raylib.WindowShouldClose())
                     Raylib.DrawText("Press ENTER to leave", 25, 650, 32, Color.WHITE);
                 }
                 else{
-                    Raylib.DrawText($"Would you like to sell your items for {inventory.Sum()}$?", 25, 550, 32, Color.WHITE);
+                    Raylib.DrawText($"Would you like to sell your items for ${inventory.Sum()}?", 25, 550, 32, Color.WHITE);
                     Raylib.DrawText("Press Y for yes", 25, 675, 32, Color.WHITE);
                     Raylib.DrawText("Press N for no", 25, 725, 32, Color.WHITE);
                 }
             }
         break;
+
+        case "taxi":
+            Raylib.DrawTexture(b.backgrounds[10], 0, 0, Color.WHITE);
+            if (sufficientFunds){
+                Raylib.DrawText($"A taxi ride costs $1000", 25, 550, 32, Color.WHITE);
+                Raylib.DrawText("Do you want to leave?", 25, 600, 32, Color.WHITE);
+                Raylib.DrawText("Press Y for yes", 25, 675, 32, Color.WHITE);
+                Raylib.DrawText("Press N for no", 25, 725, 32, Color.WHITE);
+            }
+            else{
+                Raylib.DrawText("Insufficient funds!", 25, 600, 32, Color.WHITE);
+                Raylib.DrawText("Press ENTER to leave", 25, 650, 32, Color.WHITE);
+            }
+            Raylib.DrawText("BALANCE:", 800, 625, 32, Color.GOLD);
+            Raylib.DrawText($"${balance}", 800, 675, 38, Color.GOLD);
+            if (ending){
+                Raylib.DrawTexture(blackScreen, 0, 0, alpha);
+            }
+        break;
+
+        case "endscene":
+            Raylib.DrawText("Congratulations!", 0, 0, 32, Color.WHITE);
+            Raylib.DrawText($"You finished the game in {timer/60} seconds", 0, 100, 32, Color.WHITE);
+            Raylib.DrawText($"You ended with ${balance} remaining", 0, 200, 32, Color.WHITE);
+        break;
     }
     Raylib.EndDrawing();
-    Console.WriteLine($"Y = {player.y} X= {player.x}");
+    Console.WriteLine(timer/60);
 }
