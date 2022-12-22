@@ -33,8 +33,6 @@ bool sold = false;
 bool sufficientFunds = true;
 bool ending = false;
 List<int> inventory = new();
-inventory.Add(20);
-inventory.Add(1036);
 int balance = 0;
 
 Color alpha = new(255, 255, 255, 0);
@@ -110,9 +108,11 @@ while (!Raylib.WindowShouldClose())
             player.y = 0;
             avatarShown = 0;
             enemySpeed = 2f;
+            marketLock = true;
             balance = 0;
             timer = 0;
             timerActive = false;
+            ending = false;
             inventory.Clear(); //Återställer alla dessa värden till deras ursprung varje gång man kommer till start-screen
             if (Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE))
             {
@@ -295,12 +295,11 @@ while (!Raylib.WindowShouldClose())
                 timerActive = false;
                 if (alphaVariable < 255){
                     alphaVariable++;
+                    alpha.a = (byte)alphaVariable;
                 }
-                alpha.a = (byte)alphaVariable;
-            }
-            if (alphaVariable == 255){
-                ending = false;
-                currentScene = "endscene";
+                else{
+                    currentScene = "endscene";
+                }
             }
         break;
     }
@@ -422,5 +421,4 @@ while (!Raylib.WindowShouldClose())
         break;
     }
     Raylib.EndDrawing();
-    Console.WriteLine(timer/60);
 }
