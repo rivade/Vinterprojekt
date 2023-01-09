@@ -343,7 +343,7 @@ while (!Raylib.WindowShouldClose())
             Raylib.DrawText("Don't get caught by the guard!", 260, 400, 32, Color.BLACK);
             Raylib.DrawText("Press ENTER to exit the store.", 260, 425, 32, Color.BLACK);
         break;
-
+        
         case "supermarket":
             Raylib.DrawTexture(b.backgrounds[5], 0, 0, Color.WHITE);
             Raylib.DrawTexture(f.items[itemTexture], (int)item.x, (int)item.y, Color.WHITE);
