@@ -106,6 +106,8 @@ while (!Raylib.WindowShouldClose())
         case "start":
             player.x = 0;
             player.y = 0;
+            market.x = 0;
+            market.y = 568;
             avatarShown = 0;
             enemySpeed = 2f;
             marketLock = true;
@@ -113,6 +115,7 @@ while (!Raylib.WindowShouldClose())
             timer = 0;
             timerActive = false;
             ending = false;
+            alphaVariable = 0;
             inventory.Clear(); //Återställer alla dessa värden till deras ursprung varje gång man kommer till start-screen
             if (Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE))
             {
@@ -223,7 +226,7 @@ while (!Raylib.WindowShouldClose())
                 }
             }
 
-            if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER) || Raylib.IsKeyPressed(KeyboardKey.KEY_SPACE))
             {
                 player.x = 0;
                 player.y = 0;
@@ -302,6 +305,12 @@ while (!Raylib.WindowShouldClose())
                 }
             }
         break;
+
+        case "endscene":
+            if(Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER)){
+                currentScene = "start";
+            }
+        break;
     }
 
 
@@ -363,6 +372,7 @@ while (!Raylib.WindowShouldClose())
             Raylib.DrawTexture(b.backgrounds[7], 0, 0, Color.WHITE);
             Raylib.DrawTexture(c.outfits[avatarShown], 400, 550, Color.WHITE);
             Raylib.DrawText("Busted!", 400, 350, 50, Color.RED);
+            Raylib.DrawText("Press ENTER to try again!", 300, 400, 30, Color.RED);
         break;
 
         case "market":
@@ -418,6 +428,7 @@ while (!Raylib.WindowShouldClose())
             Raylib.DrawText("Congratulations!", 0, 0, 32, Color.WHITE);
             Raylib.DrawText($"You finished the game in {timer/60} seconds", 0, 100, 32, Color.WHITE);
             Raylib.DrawText($"You ended with ${balance} remaining", 0, 200, 32, Color.WHITE);
+            Raylib.DrawText($"Press ENTER to play again", 0, 300, 32, Color.WHITE);
         break;
     }
     Raylib.EndDrawing();
