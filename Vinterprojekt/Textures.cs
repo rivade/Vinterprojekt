@@ -2,7 +2,7 @@ using Raylib_cs;
 
 class Character {
   public List<Texture2D> outfits = new();
-  public Character() //Döpt till samma som klassen, så koden körs varje gång en instans skapas
+  public Character() //Döpt till samma som klassen, så koden körs varje gång en instans skapas (Fick koden av Micke)
   {
     outfits.Add(Raylib.LoadTexture("Characters/a1.png"));
     outfits.Add(Raylib.LoadTexture("Characters/a2.png"));
