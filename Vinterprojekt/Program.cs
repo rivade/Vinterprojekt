@@ -173,7 +173,7 @@ while (!Raylib.WindowShouldClose())
             player.y = 0;
             e.enemyRect.x = 700;
             e.enemyRect.y = 500;
-            System.Threading.Thread.Sleep(7500); //Simulerar en loading screen men ger egentligen bara spelaren tid att läsa instruktioner
+            System.Threading.Thread.Sleep(7000); //Simulerar en loading screen men ger egentligen bara spelaren tid att läsa instruktioner
             currentScene = "supermarket";
         break;
 
@@ -428,7 +428,8 @@ while (!Raylib.WindowShouldClose())
             Raylib.DrawText("Congratulations!", 0, 0, 32, Color.WHITE);
             Raylib.DrawText($"You finished the game in {timer/60} seconds", 0, 100, 32, Color.WHITE);
             Raylib.DrawText($"You ended with ${balance} remaining", 0, 200, 32, Color.WHITE);
-            Raylib.DrawText($"Press ENTER to play again", 0, 300, 32, Color.WHITE);
+            Raylib.DrawText("Press ENTER to play again", 0, 300, 32, Color.WHITE);
+            Raylib.DrawText("Press ESC to exit the game", 0, 300, 32, Color.WHITE);
         break;
     }
     Raylib.EndDrawing();
